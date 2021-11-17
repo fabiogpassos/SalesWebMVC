@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SalesWebMVC.Services;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using SalesWebMVC.Services;
 
 namespace SalesWebMVC.Controllers
 {
@@ -23,7 +23,7 @@ namespace SalesWebMVC.Controllers
         {
             if (!minDate.HasValue)
             {
-                minDate = new DateTime(DateTime.Now.Year, 1, 1);
+                minDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             }
 
             if (!maxDate.HasValue)
@@ -39,9 +39,24 @@ namespace SalesWebMVC.Controllers
             return View(result);
         }
 
-        public IActionResult GroupingSearch()
+        public async Task<IActionResult> GroupingSearch(DateTime? minDate, DateTime? maxDate)
         {
-            return View();
+            if (!minDate.HasValue)
+            {
+                minDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            }
+
+            if (!maxDate.HasValue)
+            {
+                maxDate = DateTime.Now;
+            }
+
+            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
+
+            var result = await _salesRecordService.FindByDateGroupingAsync(minDate, maxDate);
+
+            return View(result);
         }
 
     }
